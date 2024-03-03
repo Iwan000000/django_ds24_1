@@ -9,6 +9,13 @@ class Course(models.Model):
     preview = models.ImageField(upload_to='previews_course/', **NULLABLE, verbose_name='превью')
     description = models.TextField(max_length=10000, verbose_name='описание')
 
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "Курс"
+        verbose_name_plural = "Курсы"
+
 
 
 class Lesson(models.Model):
@@ -18,3 +25,10 @@ class Lesson(models.Model):
     preview = models.ImageField(upload_to='previews_lesson/', **NULLABLE, verbose_name='превью')
     video_link = models.URLField(verbose_name='ссылка на видео')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='уроки', **NULLABLE)
+
+    def __str__(self):
+        return f"{self.name}({self.course}) {self.description} {self.video_link}"
+
+    class Meta:
+        verbose_name = "урок"
+        verbose_name_plural = "уроки"
