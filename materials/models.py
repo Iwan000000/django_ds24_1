@@ -1,7 +1,8 @@
 from django.db import models
 
-from users.models import NULLABLE
 
+
+NULLABLE = {"null": True, "blank": True}
 
 class Course(models.Model):
 
