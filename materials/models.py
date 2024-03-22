@@ -1,4 +1,3 @@
-
 from django.db import models
 
 from django_ds24_1 import settings
@@ -36,3 +35,14 @@ class Lesson(models.Model):
     class Meta:
         verbose_name = "урок"
         verbose_name_plural = "уроки"
+
+class Subscription(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='пользователь', **NULLABLE)
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, verbose_name='уроки', **NULLABLE)
+
+    def __str__(self):
+        return f'{self.user} {self.course}'
+
+    class Meta:
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
