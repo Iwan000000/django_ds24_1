@@ -38,10 +38,6 @@ class LessonRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = LessonSerializer
     permission_classes = [IsModerator, IsOwner]
 
-    # def get_object(self):
-    #     obj = get_object_or_404(Lesson, pk=self.kwargs["pk"])
-    #     self.check_object_permissions(self.request, obj)
-    #     return obj
 
 
 class LessonUpdateAPIView(generics.UpdateAPIView):
@@ -49,10 +45,7 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
     serializer_class = LessonSerializer
     permission_classes = [IsModerator, IsOwner]
 
-    # def get_object(self):
-    #     obj = get_object_or_404(Lesson, pk=self.kwargs["pk"])
-    #     self.check_object_permissions(self.request, obj)
-    #     return obj
+
 
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
@@ -60,10 +53,6 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
     serializer_class = LessonSerializer
     permission_classes = [IsAdminUser, IsOwner]
 
-    # def get_object(self):
-    #     obj = get_object_or_404(Lesson, pk=self.kwargs["pk"])
-    #     self.check_object_permissions(self.request, obj)
-    #     return obj
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -73,8 +62,3 @@ class PaymentViewSet(viewsets.ModelViewSet):
     filterset_fields = ['payment_date', 'paid_course', 'paid_lesson', 'payment_method']
     ordering_fields = ['payment_date']
     permission_classes = [IsModerator]
-
-    # def get_queryset(self):
-    #     if self.request.user.groups.filter(name='moderators').exists():
-    #         return Payment.objects.all()
-    #     return Payment.objects.filter(owner=self.request.user)
