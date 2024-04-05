@@ -16,6 +16,9 @@ from materials.services import create_stripe_price, create_stripe_session
 from users.models import Payment
 from users.permissions import IsModerator, IsOwner
 
+from datetime import timedelta
+from django.utils import timezone
+
 
 class CourseViewSet(viewsets.ModelViewSet):
     """Вью-сет для модели Курса"""
@@ -25,6 +28,20 @@ class CourseViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
     filter_backends = (DjangoFilterBackend,)
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        subscribed_users = instance.get_subscribed_users()
+        # Отправляем уведомление каждому подписанному пользователю
+
+        course = Course.objects.get(id=course_id)
+
+        # проверка, обновлялся ли курс более 4 часов назад
+        if course.updated_at < timezone.now() - timedelta(hours=4):
+            for user in subscribed_users:
+                if user.email:
+                    send_update_email.delay(instance.name, user.email)
+
+        return super().update(request, *args, **kwargs)
 
 
 class LessonCreateAPIView(generics.CreateAPIView):
@@ -36,6 +53,7 @@ class LessonCreateAPIView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
 
 class LessonListAPIView(generics.ListAPIView):
     queryset = Lesson.objects.all()
@@ -58,7 +76,6 @@ class LessonRetrieveAPIView(generics.RetrieveAPIView):
     search_fields = ('name', 'description')
 
 
-
 class LessonUpdateAPIView(generics.UpdateAPIView):
     """изменение записи"""
     queryset = Lesson.objects.all()
@@ -76,10 +93,11 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
-    filter_backends = [DjangoFilterBackend,]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_fields = ['payment_date', 'paid_course', 'paid_lesson', 'payment_method']
     ordering_fields = ['payment_date']
     permission_classes = [IsModerator]
+
 
 class PaymentListAPIView(ListAPIView):
     serializer_class = PaymentSerializer
@@ -87,6 +105,7 @@ class PaymentListAPIView(ListAPIView):
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ('paid_course', 'paid_lesson', 'payment_method',)
     ordering_fields = ('payment_date',)
+
 
 class PaymentCreateAPIView(CreateAPIView):
     serializer_class = PaymentSerializer
@@ -106,7 +125,7 @@ class PaymentCreateAPIView(CreateAPIView):
 class SubscriptionView(APIView):
     """Управление подпиской"""
 
-    permission_classes = [IsAuthenticated]  #  только авторизованные пользователи могут подписаться
+    permission_classes = [IsAuthenticated]  # только авторизованные пользователи могут подписаться
 
     def post(self, request, *args, **kwargs):
         user = request.user
