@@ -28,5 +28,8 @@ class Payment(models.Model):
     payment_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='к оплате')
     payment_method = models.CharField(max_length=20, choices=[('cash', 'Наличные'), ('transfer', 'Перевод на счет')], verbose_name='способ оплаты')
 
+    payment_link = models.URLField(max_length=400, verbose_name='ссылка для оплаты', **NULLABLE)
+    payment_id = models.CharField(max_length=255, verbose_name='идентификатор платежа', **NULLABLE)
+
     def __str__(self):
         return f"Платеж за {self.user.username} на {self.payment_date}"
